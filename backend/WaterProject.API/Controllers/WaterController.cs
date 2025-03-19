@@ -13,11 +13,22 @@ namespace WaterProject.API.Controllers
         public WaterController(WaterDbContext temp) => _waterContext = temp;
 
         [HttpGet("AllProjects")]
-        public IEnumerable<Project> GetProjects()
+        public IActionResult GetProjects(int pageSize = 10, int pageNum = 1)
         {
-            var projectList = _waterContext.Projects.ToList();
+            var projectList = _waterContext.Projects
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            return projectList;
+            var totalNumProjects = _waterContext.Projects.Count();
+
+            var response = new
+            {
+                Projects = projectList,
+                TotalNumProjects = totalNumProjects
+            };
+
+            return Ok(response);
         }
 
     }
